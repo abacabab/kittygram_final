@@ -14,9 +14,11 @@ services:
   backend:
     build: ./backend/
     env_file: .env
+    depends_on:
+      - db
     volumes:
       - static:/static
-      - media:/files
+      - media:/app/media
   frontend:
     build: ./frontend/
     command: cp -r /app/build/. /static/
@@ -25,7 +27,10 @@ services:
   gateway:
     build: ./nginx/
     env_file: .env
+    depends_on:
+      - backend
     ports:
       - 9000:80
     volumes:
       - static:/static
+      - media:/media
