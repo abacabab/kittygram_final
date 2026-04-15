@@ -8,14 +8,13 @@ import requests
 
 
 def _get_validated_link(
-        deploy_file_info: tuple[Path, str],
-        deploy_info_file_content: dict[str, str],
-        link_key: str
+    deploy_file_info: tuple[Path, str],
+    deploy_info_file_content: dict[str, str],
+    link_key: str,
 ) -> str:
     _, path_to_deploy_info_file = deploy_file_info
     assert link_key in deploy_info_file_content, (
-        f'Убедитесь, что файл `{path_to_deploy_info_file}` содержит ключ '
-        f'`{link_key}`.'
+        f'Убедитесь, что файл `{path_to_deploy_info_file}` содержит ключ `{link_key}`.'
     )
     link: str = deploy_info_file_content[link_key]
     assert link.startswith('https'), (
@@ -39,12 +38,9 @@ def _make_safe_request(link: str, stream: bool = False) -> requests.Response:
         response = requests.get(link, stream=stream, timeout=15)
     except requests.exceptions.SSLError:
         raise AssertionError(
-            f'Убедитесь, что настроили шифрование для `{link}`.'
-        )
+            f'Убедитесь, что настроили шифрование для `{link}`.')
     except requests.exceptions.ConnectionError:
-        raise AssertionError(
-            f'Убедитесь, что URL `{link}` доступен.'
-        )
+        raise AssertionError(f'Убедитесь, что URL `{link}` доступен.')
     expected_status = HTTPStatus.OK
     assert response.status_code == expected_status, (
         f'Убедитесь, что GET-запрос к `{link}` возвращает ответ со статусом '
@@ -54,33 +50,31 @@ def _make_safe_request(link: str, stream: bool = False) -> requests.Response:
 
 
 def _get_js_link(response: requests.Response) -> Optional[str]:
-    js_link_pattern = re.compile(r'static/js/[^\"]+')
+    js_link_pattern = re.compile(r"static/js/[^\"]+")
     search_result = re.search(js_link_pattern, response.text)
     return search_result.group(0) if search_result else None
 
 
 def test_link_connection(
-        deploy_file_info: tuple[Path, str],
-        deploy_info_file_content: dict[str, str],
-        link_key: str
+    deploy_file_info: tuple[Path, str],
+    deploy_info_file_content: dict[str, str],
+    link_key: str,
 ) -> None:
-    link = _get_validated_link(deploy_file_info, deploy_info_file_content,
-                               link_key)
+    link = _get_validated_link(
+        deploy_file_info, deploy_info_file_content, link_key)
     response = _make_safe_request(link)
     cats_project_name = 'Kittygram'
     taski_project_name = 'Taski'
     assert_msg_template = (
-        f'Убедитесь, что по ссылке `{link}` доступен проект '
-        '`{project_name}`.'
+        f'Убедитесь, что по ссылке `{link}` доступен проект `{{project_name}}`.'
     )
     if link_key == 'kittygram_domain':
-        assert cats_project_name in response.text, (
-            assert_msg_template.format(project_name=cats_project_name)
+        assert cats_project_name in response.text, assert_msg_template.format(
+            project_name=cats_project_name
         )
     else:
         assert_msg = assert_msg_template.format(
-            project_name=taski_project_name
-        )
+            project_name=taski_project_name)
         js_link = _get_js_link(response)
         assert js_link, assert_msg
         try:
@@ -92,13 +86,14 @@ def test_link_connection(
 
 
 def test_projects_on_same_ip(
-        deploy_file_info: tuple[Path, str],
-        deploy_info_file_content: dict[str, str],
-        kittygram_link_key: str, taski_link_key: str
+    deploy_file_info: tuple[Path, str],
+    deploy_info_file_content: dict[str, str],
+    kittygram_link_key: str,
+    taski_link_key: str,
 ) -> None:
     links = [
-        _get_validated_link(deploy_file_info, deploy_info_file_content,
-                            link_key)
+        _get_validated_link(
+            deploy_file_info, deploy_info_file_content, link_key)
         for link_key in (kittygram_link_key, taski_link_key)
     ]
     responses = [_make_safe_request(link, stream=True) for link in links]
@@ -113,12 +108,13 @@ def test_projects_on_same_ip(
 
 
 def test_kittygram_static_is_available(
-        deploy_file_info: tuple[Path, str],
-        deploy_info_file_content: dict[str, str],
-        kittygram_link_key: str
+    deploy_file_info: tuple[Path, str],
+    deploy_info_file_content: dict[str, str],
+    kittygram_link_key: str,
 ) -> None:
-    link = _get_validated_link(deploy_file_info, deploy_info_file_content,
-                               kittygram_link_key)
+    link = _get_validated_link(
+        deploy_file_info, deploy_info_file_content, kittygram_link_key
+    )
     response = _make_safe_request(link)
 
     js_link = _get_js_link(response)
@@ -135,17 +131,15 @@ def test_kittygram_static_is_available(
 
 
 def test_kittygram_api_available(
-        deploy_file_info: tuple[Path, str],
-        deploy_info_file_content: dict[str, str],
-        kittygram_link_key: str
+    deploy_file_info: tuple[Path, str],
+    deploy_info_file_content: dict[str, str],
+    kittygram_link_key: str,
 ) -> None:
-    link = _get_validated_link(deploy_file_info, deploy_info_file_content,
-                               kittygram_link_key)
+    link = _get_validated_link(
+        deploy_file_info, deploy_info_file_content, kittygram_link_key
+    )
     signup_link = f'{link}/api/users/'
-    form_data = {
-        'username': 'newuser',
-        'password': ''
-    }
+    form_data = {'username': 'newuser', 'password': ''}
     assert_msg = (
         'Убедитесь, что API проекта `Kittygram` доступен по ссылке формата '
         f'`{link}/api/...`.'
@@ -154,8 +148,7 @@ def test_kittygram_api_available(
         response = requests.post(signup_link, data=form_data, timeout=15)
     except requests.exceptions.SSLError:
         raise AssertionError(
-            f'Убедитесь, что настроили шифрование для `{link}`.'
-        )
+            f'Убедитесь, что настроили шифрование для `{link}`.')
     except requests.ConnectionError:
         raise AssertionError(assert_msg)
     expected_status = HTTPStatus.BAD_REQUEST
