@@ -15,83 +15,83 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Achievement',
+            name="Achievement",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.BigAutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID',
+                        verbose_name="ID",
                     ),
                 ),
-                ('name', models.CharField(max_length=64)),
+                ("name", models.CharField(max_length=64)),
             ],
         ),
         migrations.CreateModel(
-            name='AchievementCat',
+            name="AchievementCat",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.BigAutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID',
+                        verbose_name="ID",
                     ),
                 ),
                 (
-                    'achievement',
+                    "achievement",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to='cats.achievement',
+                        to="cats.achievement",
                     ),
                 ),
             ],
         ),
         migrations.CreateModel(
-            name='Cat',
+            name="Cat",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.BigAutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID',
+                        verbose_name="ID",
                     ),
                 ),
-                ('name', models.CharField(max_length=16)),
-                ('color', models.CharField(max_length=16)),
-                ('birth_year', models.IntegerField()),
+                ("name", models.CharField(max_length=16)),
+                ("color", models.CharField(max_length=16)),
+                ("birth_year", models.IntegerField()),
                 (
-                    'image',
+                    "image",
                     models.ImageField(
-                        default=None, null=True, upload_to='cats/images/'
+                        default=None, null=True, upload_to="cats/images/"
                     ),
                 ),
                 (
-                    'achievements',
+                    "achievements",
                     models.ManyToManyField(
-                        through='cats.AchievementCat', to='cats.Achievement'
+                        through="cats.AchievementCat", to="cats.Achievement"
                     ),
                 ),
                 (
-                    'owner',
+                    "owner",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name='cats',
+                        related_name="cats",
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
         ),
         migrations.AddField(
-            model_name='achievementcat',
-            name='cat',
+            model_name="achievementcat",
+            name="cat",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to='cats.cat'
+                on_delete=django.db.models.deletion.CASCADE, to="cats.cat"
             ),
         ),
     ]
